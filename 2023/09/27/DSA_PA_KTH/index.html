@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="KTH 解题报告A.所使用数据结构与算法的构思、原理和实现要点所使用的数据结构：二叉堆 算法构思：1 先利用 compare ，以控制另外两组中数据相同的方式，将三个数组分别排序。2 利用二叉堆，依次找出前k个小的组合。每次从堆中取出组合(x,y,z)后，向堆中放入与它取值相邻的组合。 实现要点：1 为了对三个数组各自进行排序，选择自己写一个归并排序。2 放入点的过程，由于没法使用 hash 或者">
+  <meta name="description" content="KTH 解题报告">
 <meta property="og:type" content="article">
 <meta property="og:title" content="魏培原">
 <meta property="og:url" content="http://example.com/2023/09/27/DSA_PA_KTH/index.html">
 <meta property="og:site_name" content="魏培原">
-<meta property="og:description" content="KTH 解题报告A.所使用数据结构与算法的构思、原理和实现要点所使用的数据结构：二叉堆 算法构思：1 先利用 compare ，以控制另外两组中数据相同的方式，将三个数组分别排序。2 利用二叉堆，依次找出前k个小的组合。每次从堆中取出组合(x,y,z)后，向堆中放入与它取值相邻的组合。 实现要点：1 为了对三个数组各自进行排序，选择自己写一个归并排序。2 放入点的过程，由于没法使用 hash 或者">
+<meta property="og:description" content="KTH 解题报告">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-27T08:04:19.789Z">
-<meta property="article:modified_time" content="2023-06-07T12:35:16.867Z">
+<meta property="article:modified_time" content="2023-09-27T08:26:11.511Z">
 <meta property="article:author" content="Wei Peiyuan">
 <meta name="twitter:card" content="summary">
 
@@ -172,16 +172,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2023-09-27 16:04:19" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:19+08:00">2023-09-27</time>
+              <time title="创建时间：2023-09-27 16:04:19 / 修改时间：16:26:11" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:19+08:00">2023-09-27</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-07 20:35:16" itemprop="dateModified" datetime="2023-06-07T20:35:16+08:00">2023-06-07</time>
-              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -201,7 +195,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="KTH-解题报告"><a href="#KTH-解题报告" class="headerlink" title="KTH 解题报告"></a>KTH 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉堆</p>
+        <h1 id="KTH-解题报告"><a href="#KTH-解题报告" class="headerlink" title="KTH 解题报告"></a>KTH 解题报告</h1> <span id="more"></span>
+<h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉堆</p>
 <h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 先利用 compare ，以控制另外两组中数据相同的方式，将三个数组分别排序。<br>2 利用二叉堆，依次找出前k个小的组合。每次从堆中取出组合(x,y,z)后，向堆中放入与它取值相邻的组合。</p>
 <h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 为了对三个数组各自进行排序，选择自己写一个归并排序。<br>2 放入点的过程，由于没法使用 hash 或者 bitmap 来避免重复放入，所以需要按照特定的顺序依次放入，直接避免重复放入。<br>3 由于不能获得数组的原始数据，所以需要存储原数组中序号来代表原数组中的实际数值。</p>
 <h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题：如何避免向堆中重复放入组合？"><a href="#问题：如何避免向堆中重复放入组合？" class="headerlink" title="问题：如何避免向堆中重复放入组合？"></a>问题：如何避免向堆中重复放入组合？</h4><p>从堆的知识中取得灵感：在堆的使用中，我们不在乎堆中元素是否要完全有序，只在乎父节点和子节点的大小关系。同理，在这个题中，我们不需要在乎堆外元素的入堆顺序，而需要保证堆内元素一定包含当前最小的元素。按“父节点的出堆使子节点入堆”的顺序，可以把元素组织成一棵树。只要这棵树的每一个父节点大于其子节点，算法的正确性就可以得到保障。在这个程序中，我使所有节点(x,y,z)出堆时，引入(x,y,z+1)，只有在z&#x3D;0时，额外引入(x,y+1,z)，在y和z都为0时，额外引入(x+1,y,z)。这样的加入顺序，可以确保所有堆外的元素，要么在堆外就有元素在所有轴上都不大于它且至少一个轴上小于它，要么在堆内有一个元素比它小。也就是说，当前的最小元素一定出现在堆中。</p>
@@ -244,8 +239,8 @@
       <i class="fa fa-chevron-left"></i> 
     </a></div>
       <div class="post-nav-item">
-    <a href="/2023/09/27/BBST/" rel="next" title="">
-       <i class="fa fa-chevron-right"></i>
+    <a href="/2023/09/27/BBST/" rel="next" title="BBST 实验报告">
+      BBST 实验报告 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -324,6 +319,11 @@
           <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
 </div>

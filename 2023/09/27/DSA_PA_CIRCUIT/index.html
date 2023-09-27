@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="CIRCUIT 解题报告A.所使用数据结构与算法的构思、原理和实现要点所使用的数据结构：二叉树（更准确地说，是Trie树） 列表 算法构思：1 二叉树的每条边代表这一位输出0或1，每个点代表一些元件的集合（或者理解为一个指定的元件输出序列前缀），从父节点走向左孩子表示该元件在这一位的输出是0，走向右孩子代表这一位输出是1。2 从前向后依次处理每个元件，当有新元件符合间隔要求而需要被考虑的时候，将它">
+  <meta name="description" content="CIRCUIT 解题报告">
 <meta property="og:type" content="article">
 <meta property="og:title" content="魏培原">
 <meta property="og:url" content="http://example.com/2023/09/27/DSA_PA_CIRCUIT/index.html">
 <meta property="og:site_name" content="魏培原">
-<meta property="og:description" content="CIRCUIT 解题报告A.所使用数据结构与算法的构思、原理和实现要点所使用的数据结构：二叉树（更准确地说，是Trie树） 列表 算法构思：1 二叉树的每条边代表这一位输出0或1，每个点代表一些元件的集合（或者理解为一个指定的元件输出序列前缀），从父节点走向左孩子表示该元件在这一位的输出是0，走向右孩子代表这一位输出是1。2 从前向后依次处理每个元件，当有新元件符合间隔要求而需要被考虑的时候，将它">
+<meta property="og:description" content="CIRCUIT 解题报告">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-27T08:04:02.018Z">
-<meta property="article:modified_time" content="2023-06-09T16:18:34.938Z">
+<meta property="article:modified_time" content="2023-09-27T08:26:11.511Z">
 <meta property="article:author" content="Wei Peiyuan">
 <meta name="twitter:card" content="summary">
 
@@ -172,16 +172,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+              <time title="创建时间：2023-09-27 16:04:02 / 修改时间：16:26:11" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-10 00:18:34" itemprop="dateModified" datetime="2023-06-10T00:18:34+08:00">2023-06-10</time>
-              </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -201,7 +195,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="CIRCUIT-解题报告"><a href="#CIRCUIT-解题报告" class="headerlink" title="CIRCUIT 解题报告"></a>CIRCUIT 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉树（更准确地说，是Trie树） 列表</p>
+        <h1 id="CIRCUIT-解题报告"><a href="#CIRCUIT-解题报告" class="headerlink" title="CIRCUIT 解题报告"></a>CIRCUIT 解题报告</h1> <span id="more"></span>
+<h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉树（更准确地说，是Trie树） 列表</p>
 <h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 二叉树的每条边代表这一位输出0或1，每个点代表一些元件的集合（或者理解为一个指定的元件输出序列前缀），从父节点走向左孩子表示该元件在这一位的输出是0，走向右孩子代表这一位输出是1。<br>2 从前向后依次处理每个元件，当有新元件符合间隔要求而需要被考虑的时候，将它加入二叉树中。反之，当一个元件距离很远，将其从二叉树中删除。<br>3 二叉树中每个节点应该维护一个值用以表示有多少个元件拥有自己所表示的序列的前缀。<br>4 二叉树中可能同时存在两个相同的元件，所以叶子结点需要连接向一个列表，用以储存所有输出序列为自己所表示的序列的元件序号。</p>
 <h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 二叉树使用结构体数组实现，列表也使用数组实现。为了用数组实现列表，我们实现一个二维数组，第一行用于储存信息，第二行用于储存列表下一项在数组中的位置。<br>2 使用贪心算法，尽量寻找与当前元件不同输出的元件，以此确保异或值最大。也正是由于这一操作，我们不用在每次查询一个元件的最佳组合时删除当前元件自身。<br>3 列表保存头地址和尾地址，确保插入和删除均为O(1)操作。</p>
 <h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题1：程序需要的空间太大，无法满足限制条件"><a href="#问题1：程序需要的空间太大，无法满足限制条件" class="headerlink" title="问题1：程序需要的空间太大，无法满足限制条件"></a>问题1：程序需要的空间太大，无法满足限制条件</h4><p>二叉树的构建需要太多节点，如果按每个元件都会带来63个新节点计算的话，如果每个二叉树节点都要存储左右孩子、链表开头、元件数目的话，二叉树和列表就将消耗 $3.15<em>10^7</em>4<em>4+5</em>10^5<em>2</em>4&#x3D;5.08*10^8Byte$，已经接近空间上限。而且，在实际测试中，过大的空间开销也会拖慢程序运行。所以，最终选择将二叉树的内部节点和叶子结点分开用两个数组实现，这样，内部节点不需要保留用不到的列表地址，叶子结点不需要保存用不到的左右孩子，而且叶子结点数目可以大幅减少至n个。</p>
@@ -327,6 +322,11 @@
           <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
 </div>

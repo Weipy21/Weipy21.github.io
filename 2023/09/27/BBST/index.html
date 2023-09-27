@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="BBST 实验报告数据结构的实现过程及复杂度分析我所实现的是 AVL 树 和 Splay 树 AVL 树 AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。 插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，">
+  <meta name="description" content="这篇笔记介绍了在实验中实现AVL树和Splay树，并设计测例分析两种树效率特点的过程。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="魏培原">
+<meta property="og:title" content="BBST 实验报告">
 <meta property="og:url" content="http://example.com/2023/09/27/BBST/index.html">
 <meta property="og:site_name" content="魏培原">
-<meta property="og:description" content="BBST 实验报告数据结构的实现过程及复杂度分析我所实现的是 AVL 树 和 Splay 树 AVL 树 AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。 插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，">
+<meta property="og:description" content="这篇笔记介绍了在实验中实现AVL树和Splay树，并设计测例分析两种树效率特点的过程。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-27T08:04:45.644Z">
-<meta property="article:modified_time" content="2023-06-19T11:18:09.901Z">
+<meta property="article:modified_time" content="2023-09-27T08:33:31.021Z">
 <meta property="article:author" content="Wei Peiyuan">
 <meta name="twitter:card" content="summary">
 
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title> | 魏培原</title>
+  <title>BBST 实验报告 | 魏培原</title>
   
 
 
@@ -163,7 +163,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          BBST 实验报告
         </h1>
 
         <div class="post-meta">
@@ -172,16 +172,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2023-09-27 16:04:45" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:45+08:00">2023-09-27</time>
+              <time title="创建时间：2023-09-27 16:04:45 / 修改时间：16:33:31" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:45+08:00">2023-09-27</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-19 19:18:09" itemprop="dateModified" datetime="2023-06-19T19:18:09+08:00">2023-06-19</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/THU-DSA/" itemprop="url" rel="index"><span itemprop="name">THU DSA</span></a>
+                </span>
+            </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -201,7 +204,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="BBST-实验报告"><a href="#BBST-实验报告" class="headerlink" title="BBST 实验报告"></a>BBST 实验报告</h1><h2 id="数据结构的实现过程及复杂度分析"><a href="#数据结构的实现过程及复杂度分析" class="headerlink" title="数据结构的实现过程及复杂度分析"></a>数据结构的实现过程及复杂度分析</h2><p>我所实现的是 AVL 树 和 Splay 树</p>
+        <p>这篇笔记介绍了在实验中实现AVL树和Splay树，并设计测例分析两种树效率特点的过程。<br> <span id="more"></span></p>
+<h2 id="数据结构的实现过程及复杂度分析"><a href="#数据结构的实现过程及复杂度分析" class="headerlink" title="数据结构的实现过程及复杂度分析"></a>数据结构的实现过程及复杂度分析</h2><p>我所实现的是 AVL 树 和 Splay 树</p>
 <h4 id="AVL-树"><a href="#AVL-树" class="headerlink" title="AVL 树"></a>AVL 树</h4><ul>
 <li>AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。</li>
 <li>插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，并在必要时进行重平衡操作。</li>
@@ -308,7 +312,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://example.com/2023/09/27/BBST/" title="">http://example.com/2023/09/27/BBST/</a>
+    <a href="http://example.com/2023/09/27/BBST/" title="BBST 实验报告">http://example.com/2023/09/27/BBST/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -387,7 +391,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BBST-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A"><span class="nav-number">1.</span> <span class="nav-text">BBST 实验报告</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E5%8F%8A%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">数据结构的实现过程及复杂度分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AVL-%E6%A0%91"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">AVL 树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Splay-%E6%A0%91"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">Splay 树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%B5%8B%E4%BE%8B%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">设计测例的思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E4%BE%8B%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90"><span class="nav-number">1.3.</span> <span class="nav-text">测例如何生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%B5%8B%E4%BE%8B%E4%B8%8B%E7%9A%84%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0%E5%8F%8A%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.4.</span> <span class="nav-text">不同数据结构在不同测例下的性能描述及原因分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.4.0.1.</span> <span class="nav-text">性能描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.4.0.2.</span> <span class="nav-text">原因分析</span></a></li></ol></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E5%8F%8A%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">数据结构的实现过程及复杂度分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AVL-%E6%A0%91"><span class="nav-number">1.0.1.</span> <span class="nav-text">AVL 树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Splay-%E6%A0%91"><span class="nav-number">1.0.2.</span> <span class="nav-text">Splay 树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%B5%8B%E4%BE%8B%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">设计测例的思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E4%BE%8B%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90"><span class="nav-number">3.</span> <span class="nav-text">测例如何生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%B5%8B%E4%BE%8B%E4%B8%8B%E7%9A%84%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0%E5%8F%8A%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">不同数据结构在不同测例下的性能描述及原因分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0"><span class="nav-number">4.0.1.</span> <span class="nav-text">性能描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">4.0.2.</span> <span class="nav-text">原因分析</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -406,6 +410,11 @@
           <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
 </div>
