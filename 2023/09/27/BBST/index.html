@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="BBST 实验报告数据结构的实现过程及复杂度分析我所实现的是 AVL 树 和 Splay 树 AVL 树 AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。 插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="魏培原">
+<meta property="og:url" content="http://example.com/2023/09/27/BBST/index.html">
+<meta property="og:site_name" content="魏培原">
+<meta property="og:description" content="BBST 实验报告数据结构的实现过程及复杂度分析我所实现的是 AVL 树 和 Splay 树 AVL 树 AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。 插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-27T08:04:45.644Z">
+<meta property="article:modified_time" content="2023-06-19T11:18:09.901Z">
+<meta property="article:author" content="Wei Peiyuan">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/09/27/BBST/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | 魏培原</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">魏培原</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/BBST/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:45" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:45+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-19 19:18:09" itemprop="dateModified" datetime="2023-06-19T19:18:09+08:00">2023-06-19</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="BBST-实验报告"><a href="#BBST-实验报告" class="headerlink" title="BBST 实验报告"></a>BBST 实验报告</h1><h2 id="数据结构的实现过程及复杂度分析"><a href="#数据结构的实现过程及复杂度分析" class="headerlink" title="数据结构的实现过程及复杂度分析"></a>数据结构的实现过程及复杂度分析</h2><p>我所实现的是 AVL 树 和 Splay 树</p>
+<h4 id="AVL-树"><a href="#AVL-树" class="headerlink" title="AVL 树"></a>AVL 树</h4><ul>
+<li>AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。</li>
+<li>插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，并在必要时进行重平衡操作。</li>
+<li>单次重平衡和高度计算的复杂度均为$O(1)$，即使重平衡沿搜索路径不断向上，也不超过$O(logn)$。而插入、删除、查询的过程耗时与搜索路径长度成正比，不超过树高$O(logn)$。因此，插入、删除和查询操作的总的时间复杂度均为$O(logn)$。（n表示总计插入的节点个数，不是题中的n）</li>
+<li>我采用指针方式构建树，在新建节点时new一个空间，在删除节点时delete一个空间，所有的信息都占用常数大小空间，因此空间复杂度为$O(n)$。</li>
+</ul>
+<h4 id="Splay-树"><a href="#Splay-树" class="headerlink" title="Splay 树"></a>Splay 树</h4><ul>
+<li>Splay 树中的每个节点，维护其指向父节点的指针。</li>
+<li>插入、删除和查询的过程，在逻辑上比较和 AVL 树一致。不同的是，在找到节点后，会将这个节点 splay 到根节点。对于删除操作，会在 splay 到根节点后再删除，之后考察这个节点的左右子树。如果右子树为空，则左子树就是剩下的树；反之，则在右子树中找最小节点（即被删除节点的直接后继），将它 splay 成为根节点，让左子树接在它的左边。</li>
+<li>splay 过程中，采用双层伸展策略，仅在与目标位置距离为1的情况下进行单层伸展。</li>
+<li>可见，插入、删除和查询单词操作复杂度仍为$O(logn)$，而 Splay 树的 splay 操作均摊复杂度为$O(logn)$，所以可以认为 Splay 树单次操作均摊复杂度为$O(logn)$。</li>
+<li>空间复杂度仍然为$O(n)$。</li>
+</ul>
+<h2 id="设计测例的思路"><a href="#设计测例的思路" class="headerlink" title="设计测例的思路"></a>设计测例的思路</h2><ul>
+<li>讨论 Splay 树和 AVL 树的优劣，就需要对数据的局部性进行设计。为了得到局部性较好的数据，我使插入和查询操作的key在随机生成之后，按照顺序由小至大排列，这样可以确保上一次操作完成后，下一次操作的目标数据就在原数据的附近，也就是说，局部性好。作为对比，我计划构建一组key顺序完全随机的数据，这个数据局部性显然会更差。（这一组变量，我简称为key有序和key无序）</li>
+<li>受 HASHFUN 的启发，我还想到：是否可以研究操作顺序对效率的影响？为此，我设计了一组完成所有插入后再删除、完成所有删除后再查询的数据，并构造一组插入、删除和查询操作随机分布的数据作为对比。（这一组变量，我简称为操作有序和操作无序）</li>
+<li>其他无关变量，如：插入、删除、查询操作各自的次数，key的最大值等，控制不变。</li>
+</ul>
+<h2 id="测例如何生成"><a href="#测例如何生成" class="headerlink" title="测例如何生成"></a>测例如何生成</h2><ul>
+<li>在数据生成器中，先得到一组两组随机生成的数组，分别代表插入的key和查询的key。他们都是无序且不重复的。</li>
+<li>如果这组数据需要key有序，则对以上两组数分别排序。</li>
+<li>删除操作需要控制被删除的key此前在插入数组中出现过，为此，构建数组restA，表示在插入数组中出现过，且还没有被删除的key。每次插入一个key，就将其加入restA；删除这个key时，将它从restA中删除。</li>
+<li>如果这组数据需要操作有序，那么先生成所有的插入操作，再生成所有的删除操作，最后生成所有的查询操作。</li>
+<li>如果这组数据需要操作无序，那么生成每次操作时，随机在0、1、2中生成一个数，来决定这一次该生成哪种操作。如果此时随机数结果表示要生成的操作已经达到了设定的该操作总次数，或者计划生成删除操作但restA为空，则重新选取随机数，直到满足条件或者所有数据生成完毕为止。</li>
+<li>无关变量控制如下：<br>插入次数：120000<br>删除次数：40000<br>查询次数：1000000<br>最大key值：4000000</li>
+</ul>
+<p>最终，得到如下四组数据：</p>
+<table>
+<thead>
+<tr>
+<th>组数</th>
+<th>key情况</th>
+<th>操作情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第1组</td>
+<td>key有序</td>
+<td>操作有序</td>
+</tr>
+<tr>
+<td>第2组</td>
+<td>key无序</td>
+<td>操作有序</td>
+</tr>
+<tr>
+<td>第3组</td>
+<td>key无序</td>
+<td>操作无序</td>
+</tr>
+<tr>
+<td>第4组</td>
+<td>key有序</td>
+<td>操作无序</td>
+</tr>
+</tbody></table>
+<h2 id="不同数据结构在不同测例下的性能描述及原因分析"><a href="#不同数据结构在不同测例下的性能描述及原因分析" class="headerlink" title="不同数据结构在不同测例下的性能描述及原因分析"></a>不同数据结构在不同测例下的性能描述及原因分析</h2><h4 id="性能描述"><a href="#性能描述" class="headerlink" title="性能描述"></a>性能描述</h4><p>使用程序完成运行的耗时作为性能描述标准，表格中数据单位均为毫秒。</p>
+<table>
+<thead>
+<tr>
+<th>实验组数</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AVL 树</td>
+<td>5838</td>
+<td>6733</td>
+<td>6468</td>
+<td>5679</td>
+</tr>
+<tr>
+<td>Splay 树</td>
+<td>5714</td>
+<td>7063</td>
+<td>6751</td>
+<td>5612</td>
+</tr>
+</tbody></table>
+<h4 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h4><ul>
+<li>对比第1组和第4组中两种树的耗时情况，可以发现：在 key 有序的情况下，Splay 树性能优于 AVL 树。这符合理论分析，因为 Splay 树更好地利用了数据的局部性，节省了时间。</li>
+<li>对比第2组和第3组中两种树的耗时情况，可以发现：在key无序的情况下，Splay 树性能劣于 AVL 树。这可能是因为 Splay 树做的结构调整操作更多，但数据局部性差，使得这些耗时操作努力白费。</li>
+<li>不论对于哪种树，有序操作性能劣于无序操作（第1、4组对比，第2、3组对比）。这可能是因为如下两个原因：<ul>
+<li>有序操作时，树的形态不稳定，需要更多调整才能满足要求；无序操作时，结束前任一时刻的数据分布更加均匀，需要做的调整次数更少。</li>
+<li>有序操作时，查询操作在最后完成，所有节点均已插入，树的规模较大；无需操作下，查询操作分散完成，很多查询操作进行时还有很多节点没有插入，树的规模较小。证据是：我检查了第2、3组输出，发现第3组的100万次查询有 2155 次以 -1 输出，而第2组则只有 25 次。这可以支持上述论断，因为两组数据的 key 均为随机生成，树的规模小才会多出很多无法查询到的值。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Wei Peiyuan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/09/27/BBST/" title="">http://example.com/2023/09/27/BBST/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/09/27/DSA_PA_KTH/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BBST-%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A"><span class="nav-number">1.</span> <span class="nav-text">BBST 实验报告</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E5%8F%8A%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">数据结构的实现过程及复杂度分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AVL-%E6%A0%91"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">AVL 树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Splay-%E6%A0%91"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">Splay 树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%B5%8B%E4%BE%8B%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">设计测例的思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E4%BE%8B%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90"><span class="nav-number">1.3.</span> <span class="nav-text">测例如何生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%B5%8B%E4%BE%8B%E4%B8%8B%E7%9A%84%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0%E5%8F%8A%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.4.</span> <span class="nav-text">不同数据结构在不同测例下的性能描述及原因分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.4.0.1.</span> <span class="nav-text">性能描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.4.0.2.</span> <span class="nav-text">原因分析</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wei Peiyuan"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Wei Peiyuan</p>
+  <div class="site-description" itemprop="description">From the depths of the sea to the edges of the galaxy, we all work together.</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wei Peiyuan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

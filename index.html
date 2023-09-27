@@ -147,7 +147,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/Hello%20World/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/BBST/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -161,7 +161,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/27/Hello%20World/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2023/09/27/BBST/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -171,8 +171,15 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-09-27 15:58:45" itemprop="dateCreated datePublished" datetime="2023-09-27T15:58:45+08:00">2023-09-27</time>
+              <time title="创建时间：2023-09-27 16:04:45" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:45+08:00">2023-09-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-19 19:18:09" itemprop="dateModified" datetime="2023-06-19T19:18:09+08:00">2023-06-19</time>
+              </span>
 
           
 
@@ -185,7 +192,809 @@
     <div class="post-body" itemprop="articleBody">
 
       
+          <h1 id="BBST-实验报告"><a href="#BBST-实验报告" class="headerlink" title="BBST 实验报告"></a>BBST 实验报告</h1><h2 id="数据结构的实现过程及复杂度分析"><a href="#数据结构的实现过程及复杂度分析" class="headerlink" title="数据结构的实现过程及复杂度分析"></a>数据结构的实现过程及复杂度分析</h2><p>我所实现的是 AVL 树 和 Splay 树</p>
+<h4 id="AVL-树"><a href="#AVL-树" class="headerlink" title="AVL 树"></a>AVL 树</h4><ul>
+<li>AVL 树中的每个节点，维护其高度和从左子树还是右子树中获得这一高度的标记。</li>
+<li>插入、删除和查询的过程，在逻辑上比较一致，都是从根节点开始，按照当前节点的key和目标key的大小关系，决定下一步走向左子树还是右子树，直到找到目标位置。不同的是，在插入和删除后，会计算当前节点高度和左右子树高度差，并在必要时进行重平衡操作。</li>
+<li>单次重平衡和高度计算的复杂度均为$O(1)$，即使重平衡沿搜索路径不断向上，也不超过$O(logn)$。而插入、删除、查询的过程耗时与搜索路径长度成正比，不超过树高$O(logn)$。因此，插入、删除和查询操作的总的时间复杂度均为$O(logn)$。（n表示总计插入的节点个数，不是题中的n）</li>
+<li>我采用指针方式构建树，在新建节点时new一个空间，在删除节点时delete一个空间，所有的信息都占用常数大小空间，因此空间复杂度为$O(n)$。</li>
+</ul>
+<h4 id="Splay-树"><a href="#Splay-树" class="headerlink" title="Splay 树"></a>Splay 树</h4><ul>
+<li>Splay 树中的每个节点，维护其指向父节点的指针。</li>
+<li>插入、删除和查询的过程，在逻辑上比较和 AVL 树一致。不同的是，在找到节点后，会将这个节点 splay 到根节点。对于删除操作，会在 splay 到根节点后再删除，之后考察这个节点的左右子树。如果右子树为空，则左子树就是剩下的树；反之，则在右子树中找最小节点（即被删除节点的直接后继），将它 splay 成为根节点，让左子树接在它的左边。</li>
+<li>splay 过程中，采用双层伸展策略，仅在与目标位置距离为1的情况下进行单层伸展。</li>
+<li>可见，插入、删除和查询单词操作复杂度仍为$O(logn)$，而 Splay 树的 splay 操作均摊复杂度为$O(logn)$，所以可以认为 Splay 树单次操作均摊复杂度为$O(logn)$。</li>
+<li>空间复杂度仍然为$O(n)$。</li>
+</ul>
+<h2 id="设计测例的思路"><a href="#设计测例的思路" class="headerlink" title="设计测例的思路"></a>设计测例的思路</h2><ul>
+<li>讨论 Splay 树和 AVL 树的优劣，就需要对数据的局部性进行设计。为了得到局部性较好的数据，我使插入和查询操作的key在随机生成之后，按照顺序由小至大排列，这样可以确保上一次操作完成后，下一次操作的目标数据就在原数据的附近，也就是说，局部性好。作为对比，我计划构建一组key顺序完全随机的数据，这个数据局部性显然会更差。（这一组变量，我简称为key有序和key无序）</li>
+<li>受 HASHFUN 的启发，我还想到：是否可以研究操作顺序对效率的影响？为此，我设计了一组完成所有插入后再删除、完成所有删除后再查询的数据，并构造一组插入、删除和查询操作随机分布的数据作为对比。（这一组变量，我简称为操作有序和操作无序）</li>
+<li>其他无关变量，如：插入、删除、查询操作各自的次数，key的最大值等，控制不变。</li>
+</ul>
+<h2 id="测例如何生成"><a href="#测例如何生成" class="headerlink" title="测例如何生成"></a>测例如何生成</h2><ul>
+<li>在数据生成器中，先得到一组两组随机生成的数组，分别代表插入的key和查询的key。他们都是无序且不重复的。</li>
+<li>如果这组数据需要key有序，则对以上两组数分别排序。</li>
+<li>删除操作需要控制被删除的key此前在插入数组中出现过，为此，构建数组restA，表示在插入数组中出现过，且还没有被删除的key。每次插入一个key，就将其加入restA；删除这个key时，将它从restA中删除。</li>
+<li>如果这组数据需要操作有序，那么先生成所有的插入操作，再生成所有的删除操作，最后生成所有的查询操作。</li>
+<li>如果这组数据需要操作无序，那么生成每次操作时，随机在0、1、2中生成一个数，来决定这一次该生成哪种操作。如果此时随机数结果表示要生成的操作已经达到了设定的该操作总次数，或者计划生成删除操作但restA为空，则重新选取随机数，直到满足条件或者所有数据生成完毕为止。</li>
+<li>无关变量控制如下：<br>插入次数：120000<br>删除次数：40000<br>查询次数：1000000<br>最大key值：4000000</li>
+</ul>
+<p>最终，得到如下四组数据：</p>
+<table>
+<thead>
+<tr>
+<th>组数</th>
+<th>key情况</th>
+<th>操作情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第1组</td>
+<td>key有序</td>
+<td>操作有序</td>
+</tr>
+<tr>
+<td>第2组</td>
+<td>key无序</td>
+<td>操作有序</td>
+</tr>
+<tr>
+<td>第3组</td>
+<td>key无序</td>
+<td>操作无序</td>
+</tr>
+<tr>
+<td>第4组</td>
+<td>key有序</td>
+<td>操作无序</td>
+</tr>
+</tbody></table>
+<h2 id="不同数据结构在不同测例下的性能描述及原因分析"><a href="#不同数据结构在不同测例下的性能描述及原因分析" class="headerlink" title="不同数据结构在不同测例下的性能描述及原因分析"></a>不同数据结构在不同测例下的性能描述及原因分析</h2><h4 id="性能描述"><a href="#性能描述" class="headerlink" title="性能描述"></a>性能描述</h4><p>使用程序完成运行的耗时作为性能描述标准，表格中数据单位均为毫秒。</p>
+<table>
+<thead>
+<tr>
+<th>实验组数</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AVL 树</td>
+<td>5838</td>
+<td>6733</td>
+<td>6468</td>
+<td>5679</td>
+</tr>
+<tr>
+<td>Splay 树</td>
+<td>5714</td>
+<td>7063</td>
+<td>6751</td>
+<td>5612</td>
+</tr>
+</tbody></table>
+<h4 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h4><ul>
+<li>对比第1组和第4组中两种树的耗时情况，可以发现：在 key 有序的情况下，Splay 树性能优于 AVL 树。这符合理论分析，因为 Splay 树更好地利用了数据的局部性，节省了时间。</li>
+<li>对比第2组和第3组中两种树的耗时情况，可以发现：在key无序的情况下，Splay 树性能劣于 AVL 树。这可能是因为 Splay 树做的结构调整操作更多，但数据局部性差，使得这些耗时操作努力白费。</li>
+<li>不论对于哪种树，有序操作性能劣于无序操作（第1、4组对比，第2、3组对比）。这可能是因为如下两个原因：<ul>
+<li>有序操作时，树的形态不稳定，需要更多调整才能满足要求；无序操作时，结束前任一时刻的数据分布更加均匀，需要做的调整次数更少。</li>
+<li>有序操作时，查询操作在最后完成，所有节点均已插入，树的规模较大；无需操作下，查询操作分散完成，很多查询操作进行时还有很多节点没有插入，树的规模较小。证据是：我检查了第2、3组输出，发现第3组的100万次查询有 2155 次以 -1 输出，而第2组则只有 25 次。这可以支持上述论断，因为两组数据的 key 均为随机生成，树的规模小才会多出很多无法查询到的值。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_KTH/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
           
+            <a href="/2023/09/27/DSA_PA_KTH/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:19" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:19+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-07 20:35:16" itemprop="dateModified" datetime="2023-06-07T20:35:16+08:00">2023-06-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="KTH-解题报告"><a href="#KTH-解题报告" class="headerlink" title="KTH 解题报告"></a>KTH 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉堆</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 先利用 compare ，以控制另外两组中数据相同的方式，将三个数组分别排序。<br>2 利用二叉堆，依次找出前k个小的组合。每次从堆中取出组合(x,y,z)后，向堆中放入与它取值相邻的组合。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 为了对三个数组各自进行排序，选择自己写一个归并排序。<br>2 放入点的过程，由于没法使用 hash 或者 bitmap 来避免重复放入，所以需要按照特定的顺序依次放入，直接避免重复放入。<br>3 由于不能获得数组的原始数据，所以需要存储原数组中序号来代表原数组中的实际数值。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题：如何避免向堆中重复放入组合？"><a href="#问题：如何避免向堆中重复放入组合？" class="headerlink" title="问题：如何避免向堆中重复放入组合？"></a>问题：如何避免向堆中重复放入组合？</h4><p>从堆的知识中取得灵感：在堆的使用中，我们不在乎堆中元素是否要完全有序，只在乎父节点和子节点的大小关系。同理，在这个题中，我们不需要在乎堆外元素的入堆顺序，而需要保证堆内元素一定包含当前最小的元素。按“父节点的出堆使子节点入堆”的顺序，可以把元素组织成一棵树。只要这棵树的每一个父节点大于其子节点，算法的正确性就可以得到保障。在这个程序中，我使所有节点(x,y,z)出堆时，引入(x,y,z+1)，只有在z&#x3D;0时，额外引入(x,y+1,z)，在y和z都为0时，额外引入(x+1,y,z)。这样的加入顺序，可以确保所有堆外的元素，要么在堆外就有元素在所有轴上都不大于它且至少一个轴上小于它，要么在堆内有一个元素比它小。也就是说，当前的最小元素一定出现在堆中。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>堆的规模为k，单次插入和删除复杂度都是O(logk)，由于一共需要进行k次，所以复杂度为O(klogk)。<br>另一部分无法忽略的时间消耗，是对三个数组分别进行归并排序的过程。复杂度为O(nlogn)。<br>综上，总体时间复杂度为O(klogk+nlogn)。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>程序中使用的都是定长数组。如果用实际使用空间进行分析的话，二叉堆所实际使用的空间为O(k)，用原数组树的序号来记录大小关系的数组所实际使用的空间为O(n)，所以总体空间复杂度为O(k+n)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_KIDD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_KIDD/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-13 19:43:28" itemprop="dateModified" datetime="2023-05-13T19:43:28+08:00">2023-05-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="KIDD-解题报告"><a href="#KIDD-解题报告" class="headerlink" title="KIDD 解题报告"></a>KIDD 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>线段树：输入的所有区间排序去重后得到最小区间，每个最小区间相当于一个线段树的叶子结点，以此构建线段树。</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 在输入后，将所有端点值排序去重，得到所有的最小区间<br>2 将输入的数据导入代表线段树的数组，充当叶子结点<br>3 从0开始，递归地建立线段树的非叶子节点。在这一过程中，同时把线段树用0补全成一棵完全二叉树。<br>4 按输入顺序执行反转和查询操作。具体来说，两个操作都从根节点开始，以递归的形式执行，将区间逐渐限制到指定的区间。<br>5 反转操作中，当传入的目标区间和当前节点区间等大，只增加懒惰标记；当传入的目标区间被包含于当前节点区间，计算当前节点的新增反转次数；之后，继续递归，如果在当前节点所代表区间的左半部分有目标区间，则继续向下方左孩子标记，右半部分同理。<br>6 查询操作中，如果当前节点有懒惰标记，则立刻将其下推给子节点；如果已经进入叶子结点，计算当前节点新增翻转次数并计入；如果传入的目标区间和当前节点区间等大，则将当前节点翻转次数计入，不向下查询；否则就继续向子节点递归。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 使用定长的结构体数组存放树的信息，每个点的信息由一个结构体对象承载。<br>2 懒惰标记及时清零，不重复记录。<br>3 查询时，不要每一次碰到懒惰标记都直接下推到叶子节点，否则会超时。实际上，只需要下推一层。因为如果需要这个节点子节点的数据的话，查询函数会递归进入子节点，自然会继续将需要的懒惰标记继续下推，而不需要的懒惰标记不用继续下推。<br>4 输入数据时，每个区间的右端点自动加1，把每个区间都变成左闭右开区间，这样做有两个好处：1 当查询一个点时，可以避免这个点的两个端点在去重时变成一个，进而导致没有建立只含该店的区间节点，最终导致查询结果偏大；2 在从小到大排序后，最后一个端点一定是加1之后产生的，因此所有端点都是左闭右开的，完全一致，不需要特别判定。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题1：五成测有些测试点出现错误"><a href="#问题1：五成测有些测试点出现错误" class="headerlink" title="问题1：五成测有些测试点出现错误"></a>问题1：五成测有些测试点出现错误</h4><p>经过对拍构造错误和调试分析，发现是因为有些节点的懒惰标记未被计入祖先节点的翻转次数，所以加入了“当传入的目标区间被包含于当前节点区间，计算当前节点的新增反转次数”。</p>
+<h4 id="问题2：九成测最后三个测试点-Wrong-Answer"><a href="#问题2：九成测最后三个测试点-Wrong-Answer" class="headerlink" title="问题2：九成测最后三个测试点 Wrong Answer"></a>问题2：九成测最后三个测试点 Wrong Answer</h4><p>考虑到九成测最后三个数据点数据量一般较大，且如果数组越界访问到其他数组并不一定会报出 Runtime Error 错误，所以认为还是有一些数组存在越界情况。最终发现，是因为：补全成完全二叉树的过程中，叶子结点会被用0补全到比区间数目更大的第一个2的幂。对于200000（这是数据范围上限）个区间来说，400000个位置的数组是不够的表示线段树的。因此，我加大了线段树数组的大小。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>每次操作的时间复杂度为O(logm)，考虑到一共有m次反转和查询操作，总体时间复杂度为O(mlogm)。m为题目描述中的m，即操作次数。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>使用的是定长数组，所以占用的空间是定值。在这些空间中，实际使用的空间是O(m)，m为题目描述中的m。这是因为所有的数据都只存储了常数次。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_HISTROY/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_HISTROY/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-13 19:49:22" itemprop="dateModified" datetime="2023-05-13T19:49:22+08:00">2023-05-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="HISTROY-解题报告"><a href="#HISTROY-解题报告" class="headerlink" title="HISTROY 解题报告"></a>HISTROY 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>散列：存储的数据是所有的学生的上一次查询次数</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 读取数据，用异或处理得到真实id<br>2 利用散列函数和冲突处理策略寻址<br>3 更新散列中储存的信息</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 使用除余法作为散列函数<br>2 使用线性试探作为冲突处理策略<br>3 为了取得更好效果，散列表的 table_size 设置为 1000003 。<br>4 使用结构体数组作为散列。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h3 id="问题：第一次尝试时，所有的插入数据均被认为是未曾出现过的"><a href="#问题：第一次尝试时，所有的插入数据均被认为是未曾出现过的" class="headerlink" title="问题：第一次尝试时，所有的插入数据均被认为是未曾出现过的"></a>问题：第一次尝试时，所有的插入数据均被认为是未曾出现过的</h3><p>经过观察源代码，发现是由于判断散列当前位置是由被占用的过程中出现了问题。为了简化，直接在散列所储存的结构体中加入一个标记是否被占用的 bool 变量。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>未参考各种资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>插入操作和查询操作类似，每次操作，不冲突时，时间复杂度为O(1)，冲突时，最坏情况为O(n)。<br>考虑到总共需要进行n次插入和查询操作，总体复杂度最优为O(n)，最坏为O(n^2)。<br>从正常情况考虑的话，设装填因子为x，则线性试探的平均成功长度为0.5*(1+1&#x2F;(1-x))。本题中最多有1000000个输入，而我设置的散列表大小为2000003，所以装填因子不会大于0.5，即平均成功长度不会大于1.5。基于这一点，可以认为n次操作的总体复杂度为O(n)。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>由于使用的是定长结构体数组，所以开辟的空间是常数值。<br>实际使用的空间大小与输入的提交记录个数成线性关系，O(n)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_CIRCUIT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_CIRCUIT/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-10 00:18:34" itemprop="dateModified" datetime="2023-06-10T00:18:34+08:00">2023-06-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CIRCUIT-解题报告"><a href="#CIRCUIT-解题报告" class="headerlink" title="CIRCUIT 解题报告"></a>CIRCUIT 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉树（更准确地说，是Trie树） 列表</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 二叉树的每条边代表这一位输出0或1，每个点代表一些元件的集合（或者理解为一个指定的元件输出序列前缀），从父节点走向左孩子表示该元件在这一位的输出是0，走向右孩子代表这一位输出是1。<br>2 从前向后依次处理每个元件，当有新元件符合间隔要求而需要被考虑的时候，将它加入二叉树中。反之，当一个元件距离很远，将其从二叉树中删除。<br>3 二叉树中每个节点应该维护一个值用以表示有多少个元件拥有自己所表示的序列的前缀。<br>4 二叉树中可能同时存在两个相同的元件，所以叶子结点需要连接向一个列表，用以储存所有输出序列为自己所表示的序列的元件序号。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 二叉树使用结构体数组实现，列表也使用数组实现。为了用数组实现列表，我们实现一个二维数组，第一行用于储存信息，第二行用于储存列表下一项在数组中的位置。<br>2 使用贪心算法，尽量寻找与当前元件不同输出的元件，以此确保异或值最大。也正是由于这一操作，我们不用在每次查询一个元件的最佳组合时删除当前元件自身。<br>3 列表保存头地址和尾地址，确保插入和删除均为O(1)操作。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题1：程序需要的空间太大，无法满足限制条件"><a href="#问题1：程序需要的空间太大，无法满足限制条件" class="headerlink" title="问题1：程序需要的空间太大，无法满足限制条件"></a>问题1：程序需要的空间太大，无法满足限制条件</h4><p>二叉树的构建需要太多节点，如果按每个元件都会带来63个新节点计算的话，如果每个二叉树节点都要存储左右孩子、链表开头、元件数目的话，二叉树和列表就将消耗 $3.15<em>10^7</em>4<em>4+5</em>10^5<em>2</em>4&#x3D;5.08*10^8Byte$，已经接近空间上限。而且，在实际测试中，过大的空间开销也会拖慢程序运行。所以，最终选择将二叉树的内部节点和叶子结点分开用两个数组实现，这样，内部节点不需要保留用不到的列表地址，叶子结点不需要保存用不到的左右孩子，而且叶子结点数目可以大幅减少至n个。</p>
+<h4 id="问题2：九成测两个测试点Wrong-Answer"><a href="#问题2：九成测两个测试点Wrong-Answer" class="headerlink" title="问题2：九成测两个测试点Wrong Answer"></a>问题2：九成测两个测试点Wrong Answer</h4><p>经过检查，发现是如下代码出现bug：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//如果当前链表有多于一个元素，则删去最早写入的元素（链表头端元素）</span></span><br><span class="line">repeat[leaf_tree[node].add][<span class="number">1</span>]=repeat[repeat[leaf_tree[node].add][<span class="number">1</span>]][<span class="number">1</span>];</span><br><span class="line">leaf_tree[node].add=repeat[leaf_tree[node].add][<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+<p>在这里，我们先把链表当前位置的尾指针指向下一个位置的尾指针，又将指向当前链表位置的指针指向了当前位置尾指针的位置，相当于让指向当前链表位置的指针跳过了两个元素，多删除了一个。考虑到被删除元素在数组中的为知不会再使用，不需要调整被删除元素的尾指针，因此直接删掉上面两行代码的第一行即可。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>二叉树每次查询、插入和删除，长度固定为64，复杂度为O(1)。对n个元件进行查询，复杂度为O(n)。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>程序代码中使用的是定长数组。从实际有效使用的空间角度分析，二叉树空间占用不超过O(n)，因为每个元件最多引入63个二叉树的新节点。而列表的空间占用，由于无论是否重复都会放入列表，所以为O(n)。综合来看，空间复杂度为O(n)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_GAME/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_GAME/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-07 17:23:30" itemprop="dateModified" datetime="2023-06-07T17:23:30+08:00">2023-06-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="GAME-解题报告"><a href="#GAME-解题报告" class="headerlink" title="GAME 解题报告"></a>GAME 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉堆 列表</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 明显地，这道题是最短路径问题，应该用 Dijkstra 算法解决。<br>2 每次查询的过程是：将第一个节点标记、入堆。找到所有和堆顶节点（即：目前的从第一关到完成该关卡用时最少的点）相邻的点，如果这个相邻点没有被标记过，则标记，入堆。<br>3 为了计算最短路径方案数目，需要在相邻点被标记过，但是现在有一个新的方案可以实现相同的最短用时的情况下，增加到达该节点的方案数。<br>4 循坏执行，直到堆空且最后一个节点已经被标记，结束后输出结果。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 每个节点的相邻节点个数不确定，需要使用列表存储。<br>2 二叉堆内部的二叉树同样用数组实现。<br>3 方案数随时取模，确保不会溢出。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题：五成测有许多测试点-Wrong-Answer"><a href="#问题：五成测有许多测试点-Wrong-Answer" class="headerlink" title="问题：五成测有许多测试点 Wrong Answer"></a>问题：五成测有许多测试点 Wrong Answer</h4><p>通过自己构造测例并仔细观察过程中的二叉堆运行情况，修正了一些写代码上的错误，使程序可以通过九成测。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>二叉堆的插入和删除操作均可在O(logn)时间内完成，一共完成n次，所以复杂度为O(nlogn)。其他时间可忽略。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>二叉堆的空间复杂度为O(n)，列表要储存所有的点相邻关系，因此空间复杂度为O(m)。储存方案数和 Dijkstra 算法中用于记录节点是否被标记过的结构，空间复杂度也为O(n)，所以总体空间复杂度为O(n+m)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_BUILD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_BUILD/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-07 21:40:52" itemprop="dateModified" datetime="2023-04-07T21:40:52+08:00">2023-04-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Build-解题报告"><a href="#Build-解题报告" class="headerlink" title="Build 解题报告"></a>Build 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>二叉树：以邻接表形式输入的数据被转化成二叉树，以便于后续访问和处理。<br>栈：为了初始化树中各节点的高度和子树规模，使用了略有改进的后序遍历。为了避免递归，使用了栈。</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1、输入数据，在输入的时候进行处理，转化成二叉树<br>2、使用略有改进的后序遍历（弟弟-&gt;兄长-&gt;父亲，而不是兄长-&gt;弟弟-&gt;父亲），初始化每个节点的高度和子树规模。<br>3、接收操作，每个操作立刻执行。具体来说：对于子树移动操作，先找到源子树，将源子树移除，修改原来位置以上各节点的子树规模和高度。再找到目的位置，将源子树接入，修改源子树节点以上各节点的子树规模和高度。对于查询操作，直接找到位置输出即可。<br>4、为了确保3中的复杂度和cost成线性关系，储存并维护每个节点的所有弟弟节点的高度最大值、子树规模之和。这样更新数据时只需要沿着找到这个点的路径回溯更新即可，不再需要遍历该点的所有弟弟节点。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1、使用定长的结构体数组存放树的信息，每个点的信息由一个结构体对象承载。<br>2、使用二叉树避免使用指针造成的空间管理困难。<br>3、移动操作中接收插入位置rank后，如果rank&gt;0，必须将rank减1，这样来寻找插入位置的兄长，以确保能够找到。<br>4、更新树的结构时，注意更新顺序，确保后面会用的信息不要先更新。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h3 id="问题1：除了前4个测试点外全部超时，而且运行时间超过2秒。"><a href="#问题1：除了前4个测试点外全部超时，而且运行时间超过2秒。" class="headerlink" title="问题1：除了前4个测试点外全部超时，而且运行时间超过2秒。"></a>问题1：除了前4个测试点外全部超时，而且运行时间超过2秒。</h3><p>考虑到已经确保复杂度不会超过cost的线性，因此考虑是死循环造成的。由于源程序中没有什么while会造成死循环，所以检查树的更新是否有问题。最终发现是摘除源子树时没有断开源子树和其弟弟的联系。</p>
+<h3 id="问题2：除了前4个测试点大面积wrong-answer。"><a href="#问题2：除了前4个测试点大面积wrong-answer。" class="headerlink" title="问题2：除了前4个测试点大面积wrong answer。"></a>问题2：除了前4个测试点大面积wrong answer。</h3><p>考虑到大量的测试点同时出现bug，还是很可能在树的更新过程中出现问题。经过检查，发现是在移动操作插入源子树后，从其父节点而不是自身开始更新信息导致错误。如果其自身储存的所有弟弟节点的高度和子树规模需要更新的话，就会因为实际上没有更新而出现错误。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>这道题最主要的耗时是在执行操作环节，其他环节可忽略。<br>确保每一次移动和查询操作自身复杂度为O(1)，找到对应操作节点的过程复杂度与cost成线性关系。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>由于使用的是定长结构体数组，所以开辟的空间是常数值。<br>实际使用的空间大小与节点个数成线性关系，O(n)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_NN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_NN/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:04:02" itemprop="dateCreated datePublished" datetime="2023-09-27T16:04:02+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-13 20:22:08" itemprop="dateModified" datetime="2023-05-13T20:22:08+08:00">2023-05-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Nearest-Neighbor-解题报告"><a href="#Nearest-Neighbor-解题报告" class="headerlink" title="Nearest Neighbor 解题报告"></a>Nearest Neighbor 解题报告</h1><h3 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h3><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>kd树。</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1 输入数据之后，从根节点开始递归建树。<br>2 建树时，如果不是根节点，则按指定轴排序后，记录中值坐标并向子节点继续递归。如果已经到达根节点，建立节点并返回。<br>3 建树完成后，逐个查询并输出结果。查询时，如果到达叶子结点，将当前点设为暂时的最近点，获得距离并返回开始解递归；如果没有到达叶子节点，根据坐标向左或右继续递归，递归完成后，检查另一侧是否可能有距离更小的点，如果可能，再向另一侧递归查询。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1 递归建树时，设置所有的建树区间为左闭右开区间，以避免特殊情况判断。<br>2 tree数组中非叶子节点只记录划分所依据的轴和坐标，叶子结点只记录输入的点坐标信息。<br>3 为了利用 cstdlib 库的 qsort ，将其进行一些封装，使其可以按指定轴排序。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h3 id="问题1：刚开始提交时，五成测的测试点仅能通过1个。"><a href="#问题1：刚开始提交时，五成测的测试点仅能通过1个。" class="headerlink" title="问题1：刚开始提交时，五成测的测试点仅能通过1个。"></a>问题1：刚开始提交时，五成测的测试点仅能通过1个。</h3><p>当时，我建立的树的非叶子节点，也是直接使用输入的点建立的。这样做不符合kd树的常规建构方式，也没法解决递归中的很多问题。最终，我按照kd树节点表示点的集合的思路，构建了正确的kd树，只有叶子节点由单个输入节点直接构成。</p>
+<h3 id="问题2：九成测有3个测试点出现-Wrong-Answer。"><a href="#问题2：九成测有3个测试点出现-Wrong-Answer。" class="headerlink" title="问题2：九成测有3个测试点出现 Wrong Answer。"></a>问题2：九成测有3个测试点出现 Wrong Answer。</h3><p>考虑到九成测最后三个数据点数据量一般较大，首先考察的两个可能错因是：1 int 和 long long 转换存在漏洞，单个数据运算结果太大，超出变量范围导致错误。2 数据规模很大，导致超出数组范围，因为触碰到其他数组内容而没有触发 Runtime Error 且出现了错误。<br>经过构造极端数据测试，排除了可能性1，于是考虑可能性2。当时，表示树的tree数组预留的位置是200000，即2倍于最大输入数据规模。在建立二叉树的过程中，考虑到100000不是2的幂，因此会有只有1个子节点的内部节点出现，这就意味着增加的非叶子节点数目可以超过100000。为了确保安全，将数组大小增加到300000，于是通过了所有测试点。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>kd树单词搜索所消耗的时间是O(n^0.5)。题目中规定，询问个数为q，所以总体复杂度为O((n^0.5)*q)。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>由于使用的是定长结构体数组，所以开辟的空间是常数值。<br>实际使用的空间大小与节点个数成线性关系O(n)，因为所有n个点的数据都只存储了常数次，而q次查询都是即时处理，根本不存储。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/DSA_PA_2_2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/DSA_PA_2_2/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:03:10" itemprop="dateCreated datePublished" datetime="2023-09-27T16:03:10+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-07 21:40:52" itemprop="dateModified" datetime="2023-04-07T21:40:52+08:00">2023-04-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="PA-2-2-解题报告"><a href="#PA-2-2-解题报告" class="headerlink" title="PA 2_2 解题报告"></a>PA 2_2 解题报告</h1><h2 id="A-所使用数据结构与算法的构思、原理和实现要点"><a href="#A-所使用数据结构与算法的构思、原理和实现要点" class="headerlink" title="A.所使用数据结构与算法的构思、原理和实现要点"></a>A.所使用数据结构与算法的构思、原理和实现要点</h2><h4 id="所使用的数据结构："><a href="#所使用的数据结构：" class="headerlink" title="所使用的数据结构："></a>所使用的数据结构：</h4><p>为实现中缀表达式求值，使用了两个栈。每个栈是用数组实现的。</p>
+<h4 id="算法构思："><a href="#算法构思：" class="headerlink" title="算法构思："></a>算法构思：</h4><p>1、仿照中缀表达式求值，对输入的多项式中的元素进行逐个处理。</p>
+<p>2、考虑到是对多项式进行计算，需要重新实现一个多项式类，替代普通中缀表达式求值中的数字。这里的数字，会以一个0次多项式的身份被处理。</p>
+<p>3、多项式的加减乘除计算，使用OOP的运算符重载实现。</p>
+<h4 id="实现要点："><a href="#实现要点：" class="headerlink" title="实现要点："></a>实现要点：</h4><p>1、对于需要补充符号的情况要考虑全面。</p>
+<p>2、多项式类显然需要维护一个储存当前多项式最高次的量，不然会运算超时。</p>
+<p>3、考虑到每次次幂最高四次，应该把它的运算直接展开，确保每个次幂运算使用最多两次乘法进行替代。</p>
+<p>4、考虑到题目没有对每一项的系数大小范围作出限制，必须在读入数据时就对系数不断取模，否则可能超出 longlong 上限。</p>
+<p>5、用int存储数据，计算时把int转化为long long计算，算后转回int。</p>
+<h2 id="B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"><a href="#B-完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料" class="headerlink" title="B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料"></a>B.完成过程中遇到的问题，排除问题的主要过程、使用的方法和技巧，以及参考资料</h2><h4 id="问题1：第七测试点-Wrong-Answer"><a href="#问题1：第七测试点-Wrong-Answer" class="headerlink" title="问题1：第七测试点 Wrong Answer"></a>问题1：第七测试点 Wrong Answer</h4><p>发现自己的程序没有考虑结果为0的情况，修正后得以通过。</p>
+<h4 id="问题2：部分测试点超时"><a href="#问题2：部分测试点超时" class="headerlink" title="问题2：部分测试点超时"></a>问题2：部分测试点超时</h4><p>使用了以下办法进行时间节省：</p>
+<p>1、把原先使用列表实现的栈改为用数组实现，避免反复new和delete耗时。</p>
+<p>2、多项式加法使用“判断大于1000000007时减去1000000007”来替代对1000000007取模。但是效果并不明显，后来取消。</p>
+<p>3、多项式乘法在系数相乘时，只对不为0的系数进行相乘。</p>
+<p>4、多项式乘法在系数相乘时，并不是每一次都直接取模，而是计算6-7次之后再取模。但是效果并不明显，后来取消。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>除了习题课PPT，没有参考其他资料。</p>
+<h2 id="C-时间和空间复杂度的估算"><a href="#C-时间和空间复杂度的估算" class="headerlink" title="C.时间和空间复杂度的估算"></a>C.时间和空间复杂度的估算</h2><h4 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h4><p>这个程序整体上对于输入多项式进行了从头到尾的一次遍历，复杂度为O(n)。</p>
+<p>栈的末尾元素读取、删除、加入等操作，复杂度为O(1)。</p>
+<p>多项式计算的复杂度，加法和减法为O(n)，乘法为O(n^2)，n代表多项式最高次项次数。</p>
+<h4 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h4><p>输入的字符串长度上限为n，则需要的两个栈空间长度应该均为n&#x2F;2；其中运算符栈每个元素是一个char，多项式栈每个元素是一个含有65位数组的自定义量，所以空间复杂度为O(n)。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/27/LAB_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Wei Peiyuan">
+      <meta itemprop="description" content="From the depths of the sea to the edges of the galaxy, we all work together.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="魏培原">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/27/LAB_1/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-27 16:03:10" itemprop="dateCreated datePublished" datetime="2023-09-27T16:03:10+08:00">2023-09-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-29 17:31:37" itemprop="dateModified" datetime="2022-10-29T17:31:37+08:00">2022-10-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="LAB-1-解题报告"><a href="#LAB-1-解题报告" class="headerlink" title="LAB_1 解题报告"></a>LAB_1 解题报告</h1><h2 id="代码01"><a href="#代码01" class="headerlink" title="代码01"></a>代码01</h2><h4 id="最严重错误类型"><a href="#最严重错误类型" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Runtime Error</p>
+<h4 id="错误原因"><a href="#错误原因" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过逐行检查，发现一处代码会超下界访问数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (size &gt;= <span class="number">3</span>) &#123;</span><br><span class="line">    a.<span class="built_in">erase</span>(left, size);</span><br><span class="line">    <span class="built_in">play</span>(left - <span class="number">1</span>);<span class="comment">//left=0时，这里可能超下界</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="测例构造思路"><a href="#测例构造思路" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>使上段代码中的 left&#x3D;0，也就是使某次消除之后，被消除的序号最小元素的序号为0。</p>
+<h2 id="代码02"><a href="#代码02" class="headerlink" title="代码02"></a>代码02</h2><h4 id="最严重错误类型-1"><a href="#最严重错误类型-1" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Runtime Error</p>
+<h4 id="错误原因-1"><a href="#错误原因-1" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过逐行检查，发现一处代码会超下界访问数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> color = a.<span class="built_in">at</span>(rank);<span class="comment">//数组为空时，这里会超下界</span></span><br></pre></td></tr></table></figure>
+<h4 id="测例构造思路-1"><a href="#测例构造思路-1" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>使某次消除之后，序列为空即可。</p>
+<h2 id="代码03"><a href="#代码03" class="headerlink" title="代码03"></a>代码03</h2><h4 id="最严重错误类型-2"><a href="#最严重错误类型-2" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Time Limit Exceeded</p>
+<h4 id="错误原因-2"><a href="#错误原因-2" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过逐行检查，未发现代码存在逻辑或者语法错误。考虑到这个算法未采取分块策略，用时较高，因此在数据量较大时会超时。</p>
+<h4 id="测例构造思路-2"><a href="#测例构造思路-2" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>尽力使得输入序列和插入操作次数最大，于是按如下规则构造测例：</p>
+<p>1、初始序列长度为规定的最大值500000，确保初始序列最大。前250000位由不断重复的ABCD构成，后250000位由不断重复的DCBA构成。</p>
+<p>2、随后进行500000次操作，确保操作次数最多。这些操作分成两个部分：前250000次操作为向序列中间位置按DCBA顺序循环插入字符，使得每次插入都能完成一次消除，直到序列为空。后250000次操作为不断向序列最前端插入同一个字符A，确保尽可能多地进行消除操作。</p>
+<p>3、按这个思路构造的测例，实现了以下三点目标：初始序列最长、操作次数最多、消除操作最多。</p>
+<h2 id="代码04"><a href="#代码04" class="headerlink" title="代码04"></a>代码04</h2><h4 id="最严重错误类型-3"><a href="#最严重错误类型-3" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-3"><a href="#错误原因-3" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过检查，发现以下代码存在问题：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (left &gt; <span class="number">0</span> &amp;&amp; a.<span class="built_in">at</span>(left) == color) --left;</span><br></pre></td></tr></table></figure>
+<p>这段代码负责的功能是：向左寻找最左端的可以消除的元素。可以发现，当最左端的可以消除的元素序号为1时，left 取得的实际值却为0，这将导致序号为0的元素被错误地删去。</p>
+<h4 id="测例构造思路-3"><a href="#测例构造思路-3" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>测例需要满足如下条件：</p>
+<p>1、序号为1的元素应当被消去</p>
+<p>2、序号为0的元素不应当被消去</p>
+<p>可见，初始序列为ABBAA，之后向中间加一个B使B消去，即可使该程序输出错误结果。</p>
+<h2 id="代码05"><a href="#代码05" class="headerlink" title="代码05"></a>代码05</h2><h4 id="最严重错误类型-4"><a href="#最严重错误类型-4" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-4"><a href="#错误原因-4" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过与其他整体相同思路的程序进行比较，发现该程序使用了 cin 进行初始序列输入，这将导致它无法处理空输入。</p>
+<h4 id="测例构造思路-4"><a href="#测例构造思路-4" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>初始序列为空即可。</p>
+<h2 id="代码06"><a href="#代码06" class="headerlink" title="代码06"></a>代码06</h2><h4 id="最严重错误类型-5"><a href="#最严重错误类型-5" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-5"><a href="#错误原因-5" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过与其他整体思路相近的程序比较，发现该程序没有在一个块的元素数量超过每一块的最大长度时对块进行重新划分，这将导致它在这一情况下把当前块的数据覆盖到其他块的存储空间中，进而导致错误。</p>
+<h4 id="测例构造思路-5"><a href="#测例构造思路-5" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>1、构造一个长度足够长（长于每个块的目标长度，即2048）的初始序列，使该程序在初始分块时至少有两个块。</p>
+<p>2、不断地向第一个块的某个位置插入字符，确保插入的字符和原序列的字符不会发生任何消除。这样的插入，至少进行超过2048次，确保第一个块的数据量超过其最大长度，将第二个块中的数据覆盖。</p>
+<p>3、这样，原本应该输出的结果中所应该包含的第二个块的内容会因被覆盖而被省略。</p>
+<h2 id="代码07"><a href="#代码07" class="headerlink" title="代码07"></a>代码07</h2><h4 id="最严重错误类型-6"><a href="#最严重错误类型-6" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-6"><a href="#错误原因-6" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过与其他整体思路相近的程序比较，发现该程序因为在执行消除操作的部分，没考虑l.first!&#x3D;r.first的情况，所以没法一次性跨越多块消除。</p>
+<p>注：因为存在左侧块内元素可能在之前的消除中被消除或者跨块连消等情况，所以必须实现跨越多块消除。</p>
+<h4 id="测例构造思路-6"><a href="#测例构造思路-6" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>不难发现，只要出现跨块消除的情况，就会让程序出现错误。在之前我为03设计的测例中，一定会出现跨块消除的情况，因为插入的位置不可能始终处于某个块的中心。所以，可以重复使用03的测例。</p>
+<h2 id="代码08"><a href="#代码08" class="headerlink" title="代码08"></a>代码08</h2><h4 id="最严重错误类型-7"><a href="#最严重错误类型-7" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-7"><a href="#错误原因-7" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过与其他整体思路相近的程序比较，发现该程序在确认消除范围时出现了代码缺失。该程序这一部分的代码为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (dis &gt; <span class="number">3</span>) &#123;</span><br><span class="line">    eliminated += dis - <span class="number">1</span>;</span><br><span class="line">    lbound = l;</span><br><span class="line">    rbound = r;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>06、07、09、10程序这一部分在循环内，且代码为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (dis &gt; <span class="number">3</span>) &#123;</span><br><span class="line">    eliminated += dis - <span class="number">1</span>;</span><br><span class="line">    lbound = l;</span><br><span class="line">    rbound = r;</span><br><span class="line">    <span class="keyword">if</span> (l.first &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        ch = <span class="built_in">get</span>(l);</span><br><span class="line">        dis = <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不难发现，该程序在找到当前消除的最左端后，没有继续执行寻找下一个元素的消除的程序，因此没法实现连续消除的功能。</p>
+<h4 id="测例构造思路-7"><a href="#测例构造思路-7" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>仿照题目中的测例设计一个连消的情况即可。</p>
+<h2 id="代码09"><a href="#代码09" class="headerlink" title="代码09"></a>代码09</h2><h4 id="最严重错误类型-8"><a href="#最严重错误类型-8" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Runtime Error</p>
+<h4 id="错误原因-8"><a href="#错误原因-8" class="headerlink" title="错误原因"></a>错误原因</h4><p>经过与其他整体思路相近的程序比较，发现该程序执行消除操作的部分没有考虑l和r在同一个块的情况。这一部分的代码为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (l.first &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    plen[l.first] = l.second + <span class="number">1</span>;<span class="comment">//在这里，该段长度被修正为左侧被消除元素所在位置</span></span><br><span class="line"><span class="keyword">if</span> (r.first &lt; pn) &#123;</span><br><span class="line">    <span class="type">int</span> len = plen[r.first] - r.second;<span class="comment">//该段长度又被减去右端长度，已经小于0了</span></span><br><span class="line">    <span class="keyword">if</span> (len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memmove</span>(&amp;p[r.first][<span class="number">0</span>], &amp;p[r.first][r.second], len);</span><br><span class="line">    &#125;</span><br><span class="line">    plen[r.first] = len;cout&lt;&lt;len&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = l.first + <span class="number">1</span>; i &lt; r.first; i++)</span><br><span class="line">    plen[i] = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>不难发现，该段代码对plen的维护是错误的，肯定会导致对数组的非法访问。</p>
+<h4 id="测例构造思路-8"><a href="#测例构造思路-8" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>既然程序对块内消除的操作一定会导致后续对数组的访问越界，只要构造一个在正常块内消除操作后继续访问的情形即可。</p>
+<h2 id="代码10"><a href="#代码10" class="headerlink" title="代码10"></a>代码10</h2><h4 id="最严重错误类型-9"><a href="#最严重错误类型-9" class="headerlink" title="最严重错误类型"></a>最严重错误类型</h4><p>Wrong Answer</p>
+<h4 id="错误原因-9"><a href="#错误原因-9" class="headerlink" title="错误原因"></a>错误原因</h4><p>这段代码是思路整体相同的各段代码中写得最全面的，因此必须逐行检查是否存在问题。检查后，一共发现了两处可能出现问题的地方：</p>
+<p>1、执行对珠子的插入操作时可能导致越界访问。这段代码为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Rank pos = <span class="built_in">find</span>(rank);</span><br><span class="line"><span class="type">char</span> *cur = &amp;<span class="built_in">get</span>(pos);</span><br><span class="line"><span class="type">int</span> succ_len = plen[pos.first] - pos.second;</span><br><span class="line"><span class="keyword">if</span> (succ_len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">memmove</span>(cur + <span class="number">1</span>, cur, succ_len);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不难发现，这段代码在使用 memmove 之前没有判断当前数组是否仍有剩余空间。如果当前数组已经达到每个数组的最大长度（即4096），则此处 memmove 会出现问题。</p>
+<p>2、执行l和r不同块的消除操作时，对于 plen 的维护存在漏洞。这段代码为：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (l.first &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    plen[l.first] = l.second + <span class="number">1</span>;<span class="comment">//第一次赋值</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (r.first &lt; pn) &#123;</span><br><span class="line">    <span class="type">int</span> len = plen[r.first] - r.second;</span><br><span class="line">    <span class="keyword">if</span> (len &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memmove</span>(&amp;p[r.first][<span class="number">0</span>], &amp;p[r.first][r.second], len);</span><br><span class="line">    &#125;</span><br><span class="line">    plen[r.first] = len;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = l.first; i &lt; r.first; i++)</span><br><span class="line">    plen[i] = <span class="number">0</span>;<span class="comment">//第二次赋值</span></span><br></pre></td></tr></table></figure>
+<p>不难发现，这段代码对于 plen[l.first] 进行了两次赋值，最终结果一定为0.但事实上，显然消除序列左端所在的块可能有元素剩余，这就会导致维护失效。</p>
+<h4 id="测例构造思路-9"><a href="#测例构造思路-9" class="headerlink" title="测例构造思路"></a>测例构造思路</h4><p>在以上两个问题中，我选择对第二个问题构造测例，因为这个问题的一部分（跨块消除）我已经分析过。具体分析如下：</p>
+<p>既然消除序列左端所在的块有元素剩余的跨块消除操作会导致维护失效，那么就应该构造这种操作。不难发现，之前对03构造的测例就符合这一条件，因为：</p>
+<p>1、这个测例被消除的部分始终位于序列的中间，而不会始终位于某个块的中间，因此会有跨块操作。</p>
+<p>2、这个测例的前250000次操作每次只消除1组，因此被消除部分的左端所在的块一定会有元素剩余，导致该块 plen 与事实不符。</p>
+<p>因此，可以再次复用03测例。</p>
+
       
     </div>
 
@@ -268,7 +1077,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -306,6 +1115,26 @@
   </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
